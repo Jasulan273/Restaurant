@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+</head>
+
+<body>
+    <h1>Menu</h1>
+    <div id="menu-container">
+        <!-- Здесь будут отображаться блюда -->
+    </div>
+
+    <script>
+        // Функция для получения данных о блюдах с сервера и их отображения
+        async function fetchAndDisplayMenu() {
+            try {
+                const response = await fetch('/menu/foods'); // Отправляем GET запрос на сервер
+                const foods = await response.json(); // Получаем данные в формате JSON
+                const menuContainer = document.getElementById('menu-container');
+
+                // Создаем HTML для каждого блюда и добавляем его в контейнер
+                foods.forEach(food => {
+                    const foodElement = document.createElement('div');
+                    foodElement.innerHTML = `<p>Name: ${food.name}</p><p>Price: ${food.price}</p><p>Rating: ${food.rating}</p>`;
+                    menuContainer.appendChild(foodElement);
+                });
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+            }
+        }
+
+        // Вызываем функцию fetchAndDisplayMenu при загрузке страницы
+        window.onload = fetchAndDisplayMenu;
+    </script>
+</body>
+
+</html>

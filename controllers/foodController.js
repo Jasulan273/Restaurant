@@ -57,7 +57,7 @@ exports.deleteFood = async (req, res) => {
     if (!food) {
       return res.status(404).json({ message: 'Food not found' });
     }
-    await food.remove();
+    await Food.deleteOne({ _id: req.params.id });
     res.json({ message: 'Food deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

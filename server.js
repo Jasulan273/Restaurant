@@ -18,10 +18,12 @@ app.use(bodyParser.json());
 const menuRoute = require('./routes/menuRoute');
 const contactsRoute = require('./routes/contactsRoute');
 const homeRoute = require('./routes/homeRoute');
+const adminRoute = require('./routes/adminRoute')
 
 app.use('/', homeRoute);
-app.use('/', contactsRoute);
-app.use('/', menuRoute);
+app.use('/contacts', contactsRoute);
+app.use('/menu', menuRoute);
+app.use('/admin', adminRoute);
 
 
 app.listen(PORT, () => {

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+</head>
+
+<body>
+    <h1>Admin Panel</h1>
+    <div>
+        <button id="addBtn">Add Food</button>
+        <button id="updateBtn">Update Food</button>
+        <button id="deleteBtn">Delete Food</button>
+    </div>
+    <div id="formContainer"></div>
+    <div id="foodList"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('addBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const formContainer = document.getElementById('formContainer');
+    const foodListContainer = document.getElementById('foodList');
+
+    addBtn.addEventListener('click', () => {
+        formContainer.innerHTML = `
+            <h2>Add Food</h2>
+            <form id="addFoodForm">
+                <input type="text" placeholder="Name" name="name">
+                <input type="number" placeholder="Price" name="price">
+                <input type="number" step="0.1" placeholder="Rating" name="rating">
+                <button type="submit">Submit</button>
+            </form>
+        `;
+        document.getElementById('addFoodForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const name = formData.get('name');
+            const price = formData.get('price');
+            const rating = formData.get('rating');
+            await fetch('/menu/foods', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price, rating })
+            });
+            location.reload();
+        });
+    });
+
+    updateBtn.addEventListener('click', async () => {
+        formContainer.innerHTML = `
+            <h2>Update Food</h2>
+            <form id="updateFoodForm">
+                <select id="foodSelect" name="foodId"></select>
+                <input type="text" placeholder="Name" name="name">
+                <input type="number" placeholder="Price" name="price">
+                <input type="number" step="0.1" placeholder="Rating" name="rating">
+                <button type="submit">Submit</button>
+            </form>
+        `;
+        const foodSelect = document.getElementById('foodSelect');
+        const foods = await fetch('/menu/foods').then(response => response.json());
+        foods.forEach(food => {
+            const option = document.createElement('option');
+            option.value = food._id;
+            option.textContent = food.name;
+            foodSelect.appendChild(option);
+        });
+
+        document.getElementById('updateFoodForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const foodId = formData.get('foodId');
+            const name = formData.get('name');
+            const price = formData.get('price');
+            const rating = formData.get('rating');
+            await fetch(`/menu/foods/${foodId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price, rating })
+            });
+            location.reload();
+        });
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+        foodListContainer.innerHTML = '';
+        const foods = await fetch('/menu/foods').then(response => response.json());
+        foods.forEach(food => {
+            const foodDiv = document.createElement('div');
+            foodDiv.innerHTML = `
+                <span>${food.name}</span>
+                <button class="deleteBtn" data-id="${food._id}">Delete</button>
+            `;
+            foodListContainer.appendChild(foodDiv);
+        });
+
+        foodListContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('deleteBtn')) {
+                const foodId = e.target.getAttribute('data-id');
+                await fetch(`/menu/foods/${foodId}`, {
+                    method: 'DELETE'
+                });
+                location.reload();
+            }
+        });
+    });
+});
+
+    </script>
+</body>
+
+</html>
